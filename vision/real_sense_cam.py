@@ -5,17 +5,18 @@ import cv2
 import time
 
 def get_depth_arr():
-    # Configure depth and color streams
+    # configure depth and color streams
     pipeline = rs.pipeline()
     config = rs.config()
 
-    # Get device product line for setting a supporting resolution
+    # get device product line for setting a supporting resolution
     pipeline_wrapper = rs.pipeline_wrapper(pipeline)
     pipeline_profile = config.resolve(pipeline_wrapper)
     device = pipeline_profile.get_device()
     depth_sensor = device.first_depth_sensor()
     depth_scale = depth_sensor.get_depth_scale()
 
+    # ensure that the RGB sensor is detected
     found_rgb = False
     for s in device.sensors:
         if s.get_info(rs.camera_info.name) == 'RGB Camera':
@@ -25,19 +26,20 @@ def get_depth_arr():
         print("requires Depth camera with Color sensor")
         exit(0)
 
+    # start streaming
     config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
-
-    # Start streaming
     pipeline.start(config)
     base_time = time.time()
+
+    # give pipeline time to wait for frames
     while time.time() - base_time < 0.25:
         depth_frame = pipeline.wait_for_frames().get_depth_frame()
         time.sleep(0.05)
     
     pipeline.stop()
 
+    # process depth/RGB frames and scale depth properly
     depth_arr = np.asanyarray(depth_frame.get_data())
-
     visual = cv2.applyColorMap(cv2.convertScaleAbs(depth_arr, alpha=0.03), cv2.COLORMAP_JET)
     distance = depth_arr * depth_scale
 
