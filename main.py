@@ -11,6 +11,8 @@ USER_VOICE_FILE = '/robot_control/modules/assets/user_voice.wav'
 GPT_VOICE_FILE = '/robot_control/modules/assets/gpt_voice.wav'
 CAM_PIC_FILE = '/robot_control/modules/assets/cam_view.png'
 
+os.environ['OPENAI_API_KEY'] = "OPENAI KEY HERE"
+
 
 if __name__ == "__main__":
 

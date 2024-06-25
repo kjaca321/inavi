@@ -3,12 +3,11 @@ import os
 import pwd
 import subprocess
 
-os.environ['OPENAI_API_KEY'] = "sk-proj-wGlurmBriyif87iiMWAMT3BlbkFJ1xhf2FL0Pgpknd0v1koU"
-
 
 def speech_to_text(input_file_path):
     client = OpenAI()
     audio_file = open(input_file_path, "rb")
+    # use openAI whisper model to transcribe audio
     transcription = client.audio.transcriptions.create(
         model="whisper-1", 
         file=audio_file
@@ -18,6 +17,7 @@ def speech_to_text(input_file_path):
 
 def text_to_speech(input_text, output_file_path):
     client = OpenAI()
+    # use tts model with echo voice to create narration
     response = client.audio.speech.create(
         model="tts-1",
         voice="echo",

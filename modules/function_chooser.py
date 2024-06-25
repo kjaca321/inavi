@@ -1,6 +1,4 @@
 from openai import OpenAI
-import os
-os.environ['OPENAI_API_KEY'] = "sk-proj-wGlurmBriyif87iiMWAMT3BlbkFJ1xhf2FL0Pgpknd0v1koU"
 
 
 TOOLS = [
@@ -55,6 +53,7 @@ TOOLS = [
 
 def choose_function(user_request):
     client = OpenAI()
+    # ask gpt to choose from the above tools based on the user's input
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": user_request}],
