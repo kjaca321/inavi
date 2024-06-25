@@ -1,16 +1,12 @@
-#!/usr/bin/env python3
-# encoding: utf-8
-# stm32 python sdk
 import enum
 import time
-import copy
 import queue
 import struct
 import serial
 import threading
 
 class PacketControllerState(enum.IntEnum):
-    # 通信协议的格式(communication protocol format)
+    # communication protocol format
     # 0xAA 0x55 Length Function ID Data Checksum
     PACKET_CONTROLLER_STATE_STARTBYTE1 = 0
     PACKET_CONTROLLER_STATE_STARTBYTE2 = 1
@@ -21,23 +17,11 @@ class PacketControllerState(enum.IntEnum):
     PACKET_CONTROLLER_STATE_CHECKSUM = 6
 
 class PacketFunction(enum.IntEnum):
-    # 可通过串口实现的控制功能(control functions achievable via serial port.)
-    PACKET_FUNC_SYS = 0
-    PACKET_FUNC_LED = 1  # LED控制(LED control)
-    PACKET_FUNC_BUZZER = 2  # 蜂鸣器控制(buzzer control)
-    PACKET_FUNC_MOTOR = 3  # 电机控制(motor control)
-    PACKET_FUNC_PWM_SERVO = 4  # PWM舵机控制, 板子上从里到外依次为1-4(PWM servo control, the board is numbered 1 to 4 from inside to outside)
-    PACKET_FUNC_BUS_SERVO = 5  # 总线舵机控制(bus servo control)
-    PACKET_FUNC_KEY = 6  # 按键获取(key obtain)
-    PACKET_FUNC_IMU = 7  # IMU获取(IMU obtain)
-    PACKET_FUNC_GAMEPAD = 8  # 手柄获取(handle grip obtain)
-    PACKET_FUNC_SBUS = 9  # 航模遥控获取(remote control for aircraft model obtain)
-    PACKET_FUNC_OLED = 10 # OLED 显示内容设置(OLED display content setting)
-    PACKET_FUNC_RGB = 11 # 设置RGB颜色(set RGB color)
-    PACKET_FUNC_NONE = 12
+    # control functions achievable via serial port.
+    PACKET_FUNC_MOTOR = 3  # motor control
 
 class PacketReportKeyEvents(enum.IntEnum):
-    # 按键的不同状态(different states of key)
+    # different states of key
     KEY_EVENT_PRESSED = 0x01
     KEY_EVENT_LONGPRESS = 0x02
     KEY_EVENT_LONGPRESS_REPEAT = 0x04
@@ -67,7 +51,7 @@ crc8_table = [
 ]
 
 def checksum_crc8(data):
-    # 校验(calibration)
+    # calibration
     check = 0
     for b in data:
         check = crc8_table[check ^ b]
@@ -75,7 +59,7 @@ def checksum_crc8(data):
 
 class SBusStatus:
     def __init__(self):
-        self.channels = [0] * 16;
+        self.channels = [0] * 16
         self.channel_17 = False
         self.channel_18 = False
         self.signal_loss = True
@@ -335,7 +319,7 @@ class Board:
         self.buf_write(PacketFunction.PACKET_FUNC_MOTOR, data)
 
     def set_oled_text(self, line, text):
-        data = [line, len(text)] # 子命令为 0x01 设置 SSID, 第二个字节是字符串长度，该长度包含'\0'字符串结束符(sub-command is 0x01, set SSID, the second byte indicates the length of the string, which includes the '\0' string termination character)
+        data = [line, len(text)] # sub-command is 0x01, set SSID, the second byte indicates the length of the string, which includes the '\0' string termination character
         data.extend(bytes(text, encoding='utf-8'))
         self.buf_write(PacketFunction.PACKET_FUNC_OLED, data)
 
@@ -563,42 +547,3 @@ def pwm_servo_test(board):
     board.pwm_servo_set_offset(servo_id, 0)
     print('offset:', board.pwm_servo_read_offset(servo_id))
     print('position:', board.pwm_servo_read_position(servo_id))
-
-if __name__ == "__main__":
-    board = Board()
-    board.enable_reception()
-    print("START...")
-    # board.set_led(0.1, 0.9, 1)
-    # board.set_buzzer(2400, 0.1, 0.9, 1)
-    board.set_motor_duty([[1, -50], [2, 50], [3, 50], [4, -50]])
-    # board.set_motor_speed([[1, -0.3], [2, 0.3], [3, -0.3], [4, 0.3]])
-    time.sleep(0.5)
-    # board.set_rgb([[1, 0, 0, 255]])
-    board.set_motor_duty([[1, 0], [2, 0], [3, 0], [4, 0]])
-    # board.set_motor_speed([[1, 0], [2, 0], [3, 0], [4, 0]])
-    # bus_servo_test(board)
-    # pwm_servo_test(board)
-    # board.set_oled_text(1, "SSID:HW-ABC123")
-    # board.set_oled_text(2, "IP:192.168.149.1")
-    while True:
-        try:
-            # res = board.get_imu()
-            # if res is not None:
-                # print(res)
-            # res = board.get_button()
-            # if res is not None:
-                # print(res)
-            # data = board.get_gamepad()
-            # if data is not None:
-                # print(data[0])
-                # print(data[1])
-            # res = board.get_sbus()
-            # if res is not None:
-                # print(res)
-            res = board.get_battery()
-            if res is not None:
-                print(res)
-            time.sleep(0.001)
-        except KeyboardInterrupt:
-            break
-

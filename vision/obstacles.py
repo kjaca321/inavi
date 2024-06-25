@@ -6,13 +6,13 @@ import os
 
 from real_sense_cam import get_depth_arr
 
-# Function to calculate the slope of a line
+# function to calculate the slope of a line
 def calculate_slope(x1, y1, x2, y2):
     if x2 - x1 == 0:  # Prevent division by zero
         return float('inf')
     return (y2 - y1) / (x2 - x1)
 
-# Function to get the average depth around a coordinate location
+# function to get the average depth around a coordinate location
 def get_neighborhood_depth(x, y, dists, a=2):
     avg = dists[y-a:y+a,x-a:x+a].mean()
     return avg if not np.isnan(avg) else dists[y][x]

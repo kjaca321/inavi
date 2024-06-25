@@ -28,7 +28,7 @@ def text_to_speech(input_text, output_file_path):
 
 def play_audio(file_path):
 
-    # Drop privileges by setting UID and GID
+    # drop privileges by setting UID and GID
     def drop_privileges():
         os.setgid(user_gid)
         os.setuid(user_uid)
@@ -39,7 +39,7 @@ def play_audio(file_path):
     user_gid = user_info.pw_gid
     user_home = user_info.pw_dir
 
-    # Prepare the environment for the user
+    # prepare the environment for the user
     env = os.environ.copy()
     env['HOME'] = user_home
     env['USER'] = 'pi'
